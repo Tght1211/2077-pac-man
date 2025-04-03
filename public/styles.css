@@ -1,0 +1,945 @@
+:root {
+  --neon-pink: #ff00ff;
+  --neon-blue: #00ffff;
+  --neon-green: #00ff00;
+  --neon-yellow: #ffff00;
+  --dark-bg: #0a0a0f;
+  --darker-bg: #050508;
+  --text-shadow: 0 0 5px rgba(255, 0, 255, 0.8);
+  --box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'Pixel';
+  src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+}
+
+body {
+  font-family: 'Press Start 2P', 'Pixel', monospace;
+  background-color: var(--darker-bg);
+  color: white;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(to right, rgba(10, 10, 15, 0.9) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(10, 10, 15, 0.9) 1px, transparent 1px);
+  background-size: 20px 20px;
+  height: 100vh;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.screen.active {
+  display: flex;
+}
+
+#start-screen {
+  background-color: var(--dark-bg);
+  z-index: 10;
+}
+
+.game-title {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: neon-flicker 2s infinite alternate;
+}
+
+.game-title h1 {
+  font-size: 3em;
+  color: var(--neon-pink);
+  text-shadow: 
+    0 0 5px var(--neon-pink),
+    0 0 10px var(--neon-pink),
+    0 0 20px var(--neon-pink);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.game-title h2 {
+  font-size: 1.5em;
+  color: var(--neon-blue);
+  text-shadow: 
+    0 0 5px var(--neon-blue),
+    0 0 10px var(--neon-blue);
+}
+
+.game-help {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.7em;
+  color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
+  line-height: 1.5;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+
+#player-name {
+  padding: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--neon-blue);
+  color: white;
+  box-shadow: 0 0 8px var(--neon-blue);
+  outline: none;
+  text-align: center;
+}
+
+#start-button {
+  padding: 15px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  background-color: transparent;
+  border: 2px solid var(--neon-green);
+  color: var(--neon-green);
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 0 8px var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+#start-button:hover {
+  background-color: var(--neon-green);
+  color: black;
+  box-shadow: 0 0 15px var(--neon-green);
+}
+
+#game-screen {
+  position: relative;
+}
+
+#game-canvas {
+  border: 2px solid var(--neon-blue);
+  box-shadow: 0 0 15px var(--neon-blue);
+  background-color: var(--dark-bg);
+}
+
+.hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.8em;
+  z-index: 5;
+}
+
+.score-container {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 5px var(--neon-yellow);
+}
+
+.players-online {
+  color: var(--neon-blue);
+  text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.level-container {
+  color: var(--neon-pink);
+  text-shadow: 0 0 5px var(--neon-pink);
+}
+
+.controls-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 0.7em;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+}
+
+.leaderboard {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--neon-pink);
+  box-shadow: 0 0 8px var(--neon-pink);
+  padding: 10px;
+  width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+.leaderboard h3 {
+  text-align: center;
+  color: var(--neon-pink);
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  text-shadow: 0 0 5px var(--neon-pink);
+}
+
+#leaderboard-list {
+  font-size: 0.7em;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.player-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.player-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* 库存和道具样式 */
+.inventory-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.inventory-item {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--neon-blue);
+  box-shadow: 0 0 5px var(--neon-blue);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inventory-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.inventory-item.active {
+  border: 2px solid var(--neon-green);
+  box-shadow: 0 0 10px var(--neon-green);
+}
+
+.item-icon {
+  font-size: 1.5em;
+}
+
+.item-count {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.6em;
+  color: white;
+}
+
+.item-key {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 0.6em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 效果显示 */
+.effects-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.effect-message {
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--neon-pink);
+  box-shadow: 0 0 8px var(--neon-pink);
+  padding: 8px 15px;
+  font-size: 0.8em;
+  color: white;
+  text-shadow: 0 0 3px var(--neon-pink);
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* 爆炸效果 */
+.explosion {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 85, 85, 0.8) 0%,
+    rgba(255, 60, 0, 0.6) 50%,
+    rgba(255, 0, 0, 0) 100%
+  );
+  transform: translate(-50%, -50%);
+  animation: explosion 2s forwards;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* 触摸控制 */
+.touch-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  width: 60%;
+  max-width: 220px;
+}
+
+/* 方向键手柄容器 */
+.dpad-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  width: 100%;
+  gap: 3px;
+}
+
+.touch-btn {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--neon-green);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neon-green);
+  font-size: 1.5em;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--neon-green);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 方向键布局 */
+.dir-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.dir-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.dir-down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.dir-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.item-use {
+  grid-column: 1 / span 3;
+  grid-row: 4;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--neon-pink);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neon-pink);
+  font-size: 1em;
+  box-shadow: 0 0 5px var(--neon-pink);
+}
+
+/* 动画 */
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow: 
+      0 0 5px var(--neon-pink),
+      0 0 10px var(--neon-pink),
+      0 0 20px var(--neon-pink);
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px var(--neon-pink);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--neon-pink), 0 0 30px var(--neon-pink);
+  }
+  100% {
+    box-shadow: 0 0 5px var(--neon-pink);
+  }
+}
+
+@keyframes explosion {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* 触摸控制按钮按下效果 */
+.touch-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 15px var(--neon-green);
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+/* 道具使用说明 */
+.item-instruction {
+  position: absolute;
+  bottom: 140px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--neon-yellow);
+  box-shadow: 0 0 8px var(--neon-yellow);
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 0.7em;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 3px var(--neon-yellow);
+  max-width: 250px;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-instruction {
+  cursor: pointer;
+  font-size: 1.2em;
+  margin-left: 10px;
+  color: var(--neon-pink);
+}
+
+.close-instruction:hover {
+  color: white;
+}
+
+/* 教程弹窗 */
+.tutorial-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.tutorial-content {
+  background-color: var(--dark-bg);
+  border: 2px solid var(--neon-blue);
+  box-shadow: 0 0 20px var(--neon-blue);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.tutorial-content h3 {
+  color: var(--neon-pink);
+  text-shadow: 0 0 5px var(--neon-pink);
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.tutorial-section {
+  margin-bottom: 20px;
+}
+
+.tutorial-section h4 {
+  color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+.tutorial-section p {
+  color: white;
+  font-size: 0.7em;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+#close-tutorial {
+  background-color: transparent;
+  border: 2px solid var(--neon-green);
+  color: var(--neon-green);
+  padding: 10px 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8em;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  margin-top: 20px;
+  box-shadow: 0 0 10px var(--neon-green);
+  transition: all 0.3s;
+}
+
+#close-tutorial:hover {
+  background-color: var(--neon-green);
+  color: black;
+}
+
+/* 陷阱样式 */
+.trap-warning {
+  position: absolute;
+  font-size: 1.2em;
+  color: red;
+  text-shadow: 0 0 10px red;
+  animation: blink 0.5s infinite alternate;
+  z-index: 5;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* 移动设备适配 */
+@media (max-width: 768px) {
+  .game-title h1 {
+    font-size: 1.8em;
+  }
+  
+  .game-title h2 {
+    font-size: 1em;
+  }
+  
+  .login-form {
+    width: 90%;
+  }
+  
+  .hud {
+    top: 10px;
+    left: 10px;
+    font-size: 0.6em;
+  }
+  
+  .leaderboard {
+    top: 10px;
+    right: 10px;
+    width: 150px;
+    max-height: 200px;
+    font-size: 0.9em;
+  }
+  
+  .inventory-container {
+    bottom: 90px;
+    right: 10px;
+    gap: 5px;
+  }
+  
+  .inventory-item {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .touch-controls {
+    bottom: 5px;
+    left: 5px;
+    width: 65%;
+  }
+  
+  .controls-hint {
+    display: none;
+  }
+  
+  .item-instruction {
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    font-size: 0.6em;
+    padding: 8px;
+  }
+  
+  .dpad-container {
+    grid-gap: 3px;
+  }
+  
+  .touch-btn {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .dir-up {
+    grid-column: 2;
+  }
+  
+  .dir-down {
+    grid-column: 2;
+  }
+  
+  .item-use {
+    height: 60px;
+    font-size: 0.9em;
+  }
+  
+  .tutorial-content {
+    width: 90%;
+    padding: 15px;
+  }
+  
+  .tutorial-content h3 {
+    font-size: 1em;
+  }
+  
+  .tutorial-section h4 {
+    font-size: 0.8em;
+  }
+  
+  .tutorial-section p {
+    font-size: 0.7em;
+  }
+  
+  /* 显示已拾取道具适配 */
+  .collected-items {
+    top: 60px;
+    left: 10px;
+    padding: 5px;
+  }
+  
+  .collected-items h3 {
+    font-size: 0.6em;
+  }
+  
+  .collected-item-icon {
+    font-size: 1em;
+  }
+  
+  .collected-item-count {
+    font-size: 0.6em;
+  }
+  
+  /* 游戏画布适配 */
+  #game-canvas {
+    width: 100%;
+    height: calc(100vh - 180px);
+    object-fit: contain;
+  }
+}
+
+/* 针对更小屏幕的额外优化 */
+@media (max-width: 480px) {
+  .touch-btn {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .item-use {
+    height: 45px;
+  }
+  
+  .inventory-item {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .inventory-item .item-icon {
+    font-size: 0.9em;
+  }
+  
+  .inventory-item .item-key {
+    font-size: 0.5em;
+  }
+  
+  #game-canvas {
+    height: calc(100vh - 160px);
+  }
+}
+
+/* 淘汰效果 */
+.elimination-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 0, 0, 0.3);
+  z-index: 8;
+  pointer-events: none;
+  animation: elimination 2s forwards;
+}
+
+@keyframes elimination {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 死亡效果 */
+.death-effect {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 0, 0, 0.8) 0%,
+    rgba(255, 0, 0, 0.2) 70%,
+    rgba(255, 0, 0, 0) 100%
+  );
+  border-radius: 50%;
+  z-index: 4;
+  animation: death-pulse 2s forwards;
+  pointer-events: none;
+}
+
+@keyframes death-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+/* 减速效果 */
+.slow-effect {
+  position: absolute;
+  font-size: 2em;
+  color: #ff8800;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  animation: slow-float 2s forwards;
+  pointer-events: none;
+}
+
+@keyframes slow-float {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(0, -30px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* 传送效果 */
+.teleport-effect {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.8) 0%,
+    rgba(170, 0, 255, 0.5) 50%,
+    rgba(255, 0, 255, 0) 100%
+  );
+  border-radius: 50%;
+  z-index: 4;
+  animation: teleport-pulse 1s forwards;
+  pointer-events: none;
+}
+
+@keyframes teleport-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* 显示已拾取的道具 */
+.collected-items {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--neon-green);
+  box-shadow: 0 0 8px var(--neon-green);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 5;
+}
+
+.collected-items h3 {
+  color: var(--neon-green);
+  font-size: 0.7em;
+  margin-bottom: 5px;
+  text-shadow: 0 0 5px var(--neon-green);
+  text-align: center;
+}
+
+.collected-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.collected-item-icon {
+  font-size: 1.2em;
+}
+
+.collected-item-count {
+  font-size: 0.7em;
+  color: white;
+}
+
+/* 敌人击败效果 */
+.enemy-defeat-effect {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.8) 0%,
+    rgba(0, 255, 0, 0.6) 50%,
+    rgba(255, 255, 0, 0) 100%
+  );
+  border-radius: 50%;
+  z-index: 4;
+  animation: enemy-defeat 1.5s forwards;
+  pointer-events: none;
+}
+
+@keyframes enemy-defeat {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* 教程弹窗更新 */
+.tutorial-section.enemies {
+  margin-top: 15px;
+}
+
+.tutorial-section.enemies h4 {
+  color: var(--neon-yellow);
+}
+
+.enemy-desc {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.enemy-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.enemy-icon.chaser {
+  color: #ff3333;
+}
+
+.enemy-icon.wanderer {
+  color: #ffcc00;
+}
+
+.enemy-icon.guardian {
+  color: #3399ff;
+} 

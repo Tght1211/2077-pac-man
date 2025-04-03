@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛博朋克吃豆人 - 多人在线版</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="game-container">
+    <div id="start-screen" class="screen active">
+      <div class="game-title">
+        <h1>赛博朋克吃豆人</h1>
+        <h2>多人在线版</h2>
+      </div>
+      <div class="login-form">
+        <input type="text" id="player-name" placeholder="输入你的名字" maxlength="10">
+        <button id="start-button">开始游戏</button>
+      </div>
+      <div class="game-help">
+        <p>收集道具，干扰对手，成为最强大的吃豆人！</p>
+        <p>小心陷阱！被陷阱击中将会立即淘汰</p>
+        <p>每完成一局，难度将会增加</p>
+      </div>
+    </div>
+    
+    <div id="game-screen" class="screen">
+      <div class="hud">
+        <div class="score-container">得分: <span id="score">0</span></div>
+        <div class="players-online">在线: <span id="players-count">0</span>/99</div>
+        <div class="level-container">
+          <span id="level-display">难度: 1</span>
+        </div>
+      </div>
+      
+      <div id="collected-items" class="collected-items">
+        <h3>已拾取道具</h3>
+        <!-- 道具列表将由JS动态添加 -->
+      </div>
+      
+      <canvas id="game-canvas"></canvas>
+      
+      <div id="effects-container" class="effects-container"></div>
+      
+      <div id="inventory-container" class="inventory-container"></div>
+      
+      <div id="item-instruction" class="item-instruction">
+        <span class="instruction-text">选择道具后点击"使用"按钮释放</span>
+        <span class="close-instruction">×</span>
+      </div>
+      
+      <div id="touch-controls" class="touch-controls"></div>
+      
+      <div class="controls-hint">
+        <p>使用 WASD 或方向键移动</p>
+        <p>数字键 1-5 选择道具，空格使用</p>
+      </div>
+    </div>
+    
+    <div id="leaderboard" class="leaderboard">
+      <h3>排行榜</h3>
+      <div id="leaderboard-list"></div>
+    </div>
+    
+    <div id="tutorial-modal" class="tutorial-modal">
+      <div class="tutorial-content">
+        <h3>游戏说明</h3>
+        <div class="tutorial-section">
+          <h4>道具使用方法</h4>
+          <p>1. 点击下方道具图标选择要使用的道具</p>
+          <p>2. 点击右侧"使用"按钮释放道具效果</p>
+        </div>
+        <div class="tutorial-section">
+          <h4>道具效果</h4>
+          <p>💣 炸弹: 清除范围内豆子并得分</p>
+          <p>⚡ 加速: 短时间内移动更快</p>
+          <p>❄️ 冻结: 使其他玩家暂停移动</p>
+          <p>💫 混乱: 使其他玩家控制反向</p>
+          <p>🛡️ 护盾: 免疫其他玩家的道具效果</p>
+        </div>
+        <div class="tutorial-section">
+          <h4>小心陷阱！</h4>
+          <p>⚠️ 地图中隐藏着陷阱，碰到将被淘汰！</p>
+        </div>
+        <div class="tutorial-section enemies">
+          <h4>敌人类型</h4>
+          <div class="enemy-desc">
+            <div class="enemy-icon chaser">▲</div>
+            <p>追踪者: 追逐最近的玩家</p>
+          </div>
+          <div class="enemy-desc">
+            <div class="enemy-icon wanderer">■</div>
+            <p>徘徊者: 随机移动</p>
+          </div>
+          <div class="enemy-desc">
+            <div class="enemy-icon guardian">●</div>
+            <p>守卫者: 守护特定区域</p>
+          </div>
+          <p>提示: 吃下能量豆后可以暂时消灭敌人!</p>
+        </div>
+        <button id="close-tutorial">开始游戏</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html> 
